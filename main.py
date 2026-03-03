@@ -204,7 +204,7 @@ const bgc = document.getElementById('bg-canvas');
 for(let i=0;i<10;i++){const l=document.createElement('div');l.className='arc-line';l.style.cssText=`left:${Math.random()*100}%;height:${50+Math.random()*50}%;top:${Math.random()*50}%;--dur:${3+Math.random()*5}s;--delay:${Math.random()*4}s`;bgc.appendChild(l);}
 let ws,isThinking=false;
 function connect(){
-  ws=new WebSocket('ws://'+location.host+'/ws');
+  ws=new WebSocket((location.protocol==='https:'?'wss://':'ws://')+location.host+'/ws');
   ws.onopen=()=>{document.getElementById('ws-dot').style.background='#4db8ff';document.getElementById('ws-label').textContent='CONNECTED';};
   ws.onclose=()=>{document.getElementById('ws-label').textContent='RECONNECTING';setTimeout(connect,3000);};
   ws.onmessage=e=>{
