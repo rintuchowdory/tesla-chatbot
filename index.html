@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Tesla AI — Portfolio</title>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;900&family=Crimson+Pro:ital,wght@0,300;0,400;1,300;1,400&family=Share+Tech+Mono&display=swap" rel="stylesheet"/>
+<style>
+:root{--bg:#05080f;--surface:#080d18;--card:#0a1220;--border:rgba(100,180,255,0.15);--arc:#4db8ff;--arc-dim:#1a5a8a;--gold:#c9a84c;--white:#e8f4ff;--muted:#4a6a8a;--red:#ff4455;}
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box;}
+html,body{min-height:100%;overflow-x:hidden;}
+body{background:var(--bg);color:var(--white);font-family:'Crimson Pro',serif;display:flex;flex-direction:column;}
+.grid-overlay{position:fixed;inset:0;z-index:0;pointer-events:none;background-image:linear-gradient(rgba(77,184,255,0.03) 1px,transparent 1px),linear-gradient(90deg,rgba(77,184,255,0.03) 1px,transparent 1px);background-size:50px 50px;}
+.vignette{position:fixed;inset:0;z-index:0;pointer-events:none;background:radial-gradient(ellipse at center,transparent 40%,rgba(5,8,15,0.8) 100%);}
+.arc-line{position:fixed;width:1px;background:linear-gradient(to bottom,transparent,var(--arc-dim),transparent);opacity:0.3;animation:arcFlicker var(--dur,4s) ease-in-out infinite var(--delay,0s);}
+@keyframes arcFlicker{0%,100%{opacity:0.1;}50%{opacity:0.5;}75%{opacity:0.2;}}
+.bolt{position:absolute;top:0;width:2px;height:100%;background:linear-gradient(to bottom,var(--arc),transparent);opacity:0;animation:bolt 6s ease-in-out infinite;}
+.bolt:nth-child(1){left:10%;}.bolt:nth-child(2){left:50%;animation-delay:2s;}.bolt:nth-child(3){left:90%;animation-delay:4s;}
+@keyframes bolt{0%,100%{opacity:0;}5%{opacity:0.8;}10%{opacity:0;}15%{opacity:0.4;}20%{opacity:0;}}
+header{position:relative;z-index:10;padding:1.2rem 2rem .8rem;text-align:center;border-bottom:1px solid var(--border);background:rgba(5,8,15,0.85);backdrop-filter:blur(10px);}
+h1{font-family:'Cinzel',serif;font-size:clamp(1.6rem,4vw,2.6rem);font-weight:900;letter-spacing:0.15em;color:var(--white);text-shadow:0 0 30px rgba(77,184,255,0.5);}
+.title-arc{font-family:'Share Tech Mono',monospace;font-size:.62rem;letter-spacing:.4em;color:var(--arc);margin-top:.2rem;opacity:.7;}
+.status-bar{display:flex;align-items:center;justify-content:center;gap:1.5rem;margin-top:.6rem;flex-wrap:wrap;}
+.status-item{display:flex;align-items:center;gap:.35rem;font-family:'Share Tech Mono',monospace;font-size:.58rem;color:var(--muted);}
+.status-dot{width:5px;height:5px;border-radius:50%;background:var(--arc);animation:sdpulse 2s infinite;}
+@keyframes sdpulse{0%,100%{box-shadow:0 0 0 0 rgba(77,184,255,.4);}50%{box-shadow:0 0 0 4px rgba(77,184,255,0);}}
+
+.portrait-wrap{position:relative;z-index:10;display:flex;justify-content:center;padding:2rem 0 1rem;}
+.portrait{width:90px;height:90px;border-radius:50%;border:2px solid var(--arc-dim);background:radial-gradient(circle at 40% 35%,#1a3a5a,#050810);display:flex;align-items:center;justify-content:center;font-size:2.6rem;box-shadow:0 0 30px rgba(77,184,255,0.3);animation:portraitPulse 3s ease-in-out infinite alternate;}
+@keyframes portraitPulse{from{box-shadow:0 0 20px rgba(77,184,255,0.2);}to{box-shadow:0 0 50px rgba(77,184,255,0.5);}}
+
+.main{position:relative;z-index:10;max-width:800px;margin:0 auto;padding:1.5rem 1.5rem 3rem;width:100%;}
+
+.about-card{background:rgba(77,184,255,.04);border:1px solid var(--border);border-radius:14px;padding:1.5rem;margin-bottom:1.2rem;}
+.about-card p{font-size:1.05rem;line-height:1.8;color:var(--white);opacity:.85;}
+
+.tech-row{display:flex;flex-wrap:wrap;gap:.4rem;margin:1rem 0 0;}
+.tech-chip{padding:.25rem .7rem;background:rgba(77,184,255,.07);border:1px solid rgba(77,184,255,.2);border-radius:20px;color:var(--arc);font-family:'Share Tech Mono',monospace;font-size:.6rem;letter-spacing:.05em;}
+
+.features-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:.8rem;margin-bottom:1.2rem;}
+.feature-card{background:rgba(77,184,255,.04);border:1px solid var(--border);border-radius:12px;padding:1rem 1.1rem;}
+.feature-icon{font-size:1.4rem;margin-bottom:.5rem;}
+.feature-title{font-family:'Share Tech Mono',monospace;font-size:.65rem;letter-spacing:.1em;color:var(--arc);margin-bottom:.35rem;}
+.feature-desc{font-size:.88rem;color:var(--muted);line-height:1.6;}
+
+.suggest-section{margin-bottom:1.2rem;}
+.section-label{font-family:'Share Tech Mono',monospace;font-size:.6rem;letter-spacing:.15em;color:var(--muted);margin-bottom:.6rem;}
+.chips{display:flex;flex-wrap:wrap;gap:.4rem;}
+.suggest-chip{white-space:nowrap;padding:.3rem .75rem;background:rgba(77,184,255,.05);border:1px solid rgba(77,184,255,.12);border-radius:20px;color:var(--muted);font-family:'Share Tech Mono',monospace;font-size:.58rem;cursor:default;}
+
+.cta-row{display:flex;gap:.8rem;flex-wrap:wrap;margin-top:1.5rem;}
+.btn{display:inline-flex;align-items:center;gap:.4rem;padding:.65rem 1.4rem;border-radius:9px;font-family:'Share Tech Mono',monospace;font-size:.65rem;letter-spacing:.08em;text-decoration:none;transition:all .2s;cursor:pointer;}
+.btn-primary{background:linear-gradient(135deg,var(--arc-dim),var(--arc));color:var(--bg);border:none;}
+.btn-primary:hover{opacity:.85;transform:scale(1.03);}
+.btn-secondary{background:rgba(77,184,255,.08);border:1px solid rgba(77,184,255,.25);color:var(--arc);}
+.btn-secondary:hover{background:rgba(77,184,255,.15);}
+
+.input-bar{position:relative;z-index:10;padding:.75rem 1.5rem 1rem;background:rgba(5,8,15,.9);backdrop-filter:blur(10px);border-top:1px solid var(--border);margin-top:auto;}
+.input-wrap{display:flex;gap:.6rem;align-items:center;background:rgba(10,18,32,.8);border:1px solid var(--border);border-radius:12px;padding:.4rem .6rem;max-width:800px;margin:0 auto;}
+.fake-input{flex:1;font-family:'Crimson Pro',serif;font-size:1rem;color:var(--muted);font-style:italic;padding:.2rem 0;}
+.voice-btn{width:30px;height:30px;min-width:30px;border-radius:7px;background:rgba(77,184,255,.08);border:1px solid rgba(77,184,255,.2);color:var(--muted);font-size:.85rem;display:flex;align-items:center;justify-content:center;}
+.send-btn{width:34px;height:34px;min-width:34px;border-radius:8px;background:linear-gradient(135deg,var(--arc-dim),var(--arc));border:none;color:var(--bg);font-size:.9rem;display:flex;align-items:center;justify-content:center;}
+.hint{font-family:'Share Tech Mono',monospace;font-size:.55rem;color:var(--muted);text-align:center;margin-top:.35rem;letter-spacing:.04em;}
+.hint span{color:var(--arc);}
+
+.badge-live{display:inline-flex;align-items:center;gap:.3rem;padding:.2rem .7rem;border-radius:20px;background:rgba(29,158,117,.12);border:1px solid rgba(29,158,117,.3);color:#1D9E75;font-family:'Share Tech Mono',monospace;font-size:.58rem;margin-bottom:1rem;}
+.badge-dot{width:5px;height:5px;border-radius:50%;background:#1D9E75;animation:sdpulse 2s infinite;}
+</style>
+</head>
+<body>
+<div class="grid-overlay"></div>
+<div class="vignette"></div>
+<div id="bg-canvas" style="position:fixed;inset:0;z-index:0;pointer-events:none;"></div>
+
+<header>
+  <div style="position:absolute;left:0;top:0;width:100%;height:100%;overflow:hidden;pointer-events:none;">
+    <div class="bolt"></div><div class="bolt"></div><div class="bolt"></div>
+  </div>
+  <h1>NIKOLA TESLA</h1>
+  <div class="title-arc">⚡ Interactive AI Assistant ⚡</div>
+  <div class="status-bar">
+    <div class="status-item"><div class="status-dot"></div>PYTHON BACKEND</div>
+    <div class="status-item"><div class="status-dot"></div>AI POWERED</div>
+    <div class="status-item"><div class="status-dot"></div>VOICE READY</div>
+    <div class="status-item"><div class="status-dot"></div>WEBSOCKET</div>
+  </div>
+</header>
+
+<div class="portrait-wrap">
+  <div class="portrait">🧑‍🔬</div>
+</div>
+
+<div class="main">
+  <div style="text-align:center;margin-bottom:1.5rem;">
+    <div class="badge-live"><div class="badge-dot"></div>PORTFOLIO PROJECT — DEVOPS MESH</div>
+  </div>
+
+  <div class="about-card">
+    <p>A real-time AI chatbot that lets you converse with <strong style="color:var(--arc)">Nikola Tesla</strong>. Built with FastAPI and WebSockets, Tesla responds in character using Google Text-to-Speech voice synthesis. Supports both text and voice input, with OpenAI GPT-3.5 for intelligent responses.</p>
+    <div class="tech-row">
+      <span class="tech-chip">Python 3.12</span>
+      <span class="tech-chip">FastAPI</span>
+      <span class="tech-chip">WebSocket</span>
+      <span class="tech-chip">gTTS Voice</span>
+      <span class="tech-chip">OpenAI GPT-3.5</span>
+      <span class="tech-chip">Uvicorn</span>
+      <span class="tech-chip">asyncio</span>
+    </div>
+  </div>
+
+  <div class="features-grid">
+    <div class="feature-card">
+      <div class="feature-icon">⚡</div>
+      <div class="feature-title">REAL-TIME WEBSOCKET</div>
+      <div class="feature-desc">Bidirectional live communication between browser and FastAPI backend — no page reloads.</div>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon">🔊</div>
+      <div class="feature-title">VOICE SYNTHESIS</div>
+      <div class="feature-desc">Tesla speaks his responses using Google TTS — audio streamed as base64 and played instantly.</div>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon">🎙️</div>
+      <div class="feature-title">VOICE INPUT</div>
+      <div class="feature-desc">Web Speech API integration — speak your question and Tesla responds in kind.</div>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon">🧠</div>
+      <div class="feature-title">AI IN CHARACTER</div>
+      <div class="feature-desc">System-prompted GPT-3.5 keeps Tesla in character — passionate, dramatic, visionary.</div>
+    </div>
+  </div>
+
+  <div class="suggest-section">
+    <div class="section-label">SAMPLE QUESTIONS YOU CAN ASK TESLA</div>
+    <div class="chips">
+      <span class="suggest-chip">⚡ AC Power</span>
+      <span class="suggest-chip">🥊 vs Edison</span>
+      <span class="suggest-chip">🌀 Tesla Coil</span>
+      <span class="suggest-chip">🗼 Wardenclyffe</span>
+      <span class="suggest-chip">💡 Greatest Invention</span>
+      <span class="suggest-chip">📡 Wireless Power</span>
+      <span class="suggest-chip">🔮 Future of Energy</span>
+      <span class="suggest-chip">💧 Niagara Falls</span>
+    </div>
+  </div>
+
+  <div class="cta-row">
+    <a class="btn btn-primary" href="https://github.com/rintuchowdory/tesla-chatbot">⚡ View Source Code</a>
+    <a class="btn btn-secondary" href="https://github.com/rintuchowdory/tesla-chatbot/blob/main/main.py">📄 main.py</a>
+    <a class="btn btn-secondary" href="https://github.com/rintuchowdory/tesla-chatbot/blob/main/requirements.txt">📦 requirements.txt</a>
+  </div>
+</div>
+
+<div class="input-bar">
+  <div class="input-wrap">
+    <div class="voice-btn">🎙️</div>
+    <div class="fake-input">Ask Tesla anything about electricity, invention, the universe...</div>
+    <div class="send-btn">⚡</div>
+  </div>
+  <div class="hint">Run locally with <span>./start.sh</span> • View source on <span>GitHub →</span></div>
+</div>
+
+<script>
+const bgc=document.getElementById('bg-canvas');
+for(let i=0;i<10;i++){
+  const l=document.createElement('div');
+  l.className='arc-line';
+  l.style.cssText=`left:${Math.random()*100}%;height:${50+Math.random()*50}%;top:${Math.random()*50}%;--dur:${3+Math.random()*5}s;--delay:${Math.random()*4}s`;
+  bgc.appendChild(l);
+}
+</script>
+</body>
+</html>
