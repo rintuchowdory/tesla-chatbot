@@ -95,12 +95,13 @@ h1{font-family:var(--font-title);font-size:clamp(1.6rem,4vw,2.6rem);font-weight:
 .chips{display:flex;flex-wrap:wrap;gap:.4rem;}
 .suggest-chip{white-space:nowrap;padding:.3rem .75rem;
   background:rgba(77,184,255,.05);border:1px solid rgba(77,184,255,.12);
-  border-radius:20px;color:var(--muted);font-family:var(--font-mono);font-size:.6rem;}
+  border-radius:20px;color:var(--muted);font-family:var(--font-mono);font-size:.6rem;cursor:pointer;transition:all .2s;}
+.suggest-chip:hover{background:rgba(77,184,255,.15);color:var(--arc);}
 
 .cta-row{display:flex;gap:.8rem;flex-wrap:wrap;}
 .btn{display:inline-flex;align-items:center;gap:.4rem;padding:.65rem 1.4rem;
   border-radius:9px;font-family:var(--font-mono);font-size:.65rem;
-  letter-spacing:.08em;text-decoration:none;transition:all .2s;}
+  letter-spacing:.08em;text-decoration:none;transition:all .2s;cursor:pointer;border:none;}
 .btn-primary{background:linear-gradient(135deg,var(--arc-dim),var(--arc));
   color:var(--bg);border:none;font-weight:700;}
 .btn-primary:hover{opacity:.85;transform:scale(1.03);}
@@ -113,16 +114,18 @@ h1{font-family:var(--font-title);font-size:clamp(1.6rem,4vw,2.6rem);font-weight:
 .input-wrap{display:flex;gap:.6rem;align-items:center;
   background:rgba(10,18,32,.8);border:1px solid var(--border);
   border-radius:12px;padding:.4rem .6rem;max-width:800px;margin:0 auto;}
-.fake-input{flex:1;font-family:var(--font-body);font-size:1rem;
-  color:var(--muted);font-style:italic;padding:.2rem 0;
-  user-select:none;}
+#chat-input{flex:1;font-family:var(--font-body);font-size:1rem;
+  color:var(--white);padding:.2rem 0;background:transparent;border:none;outline:none;}
+#chat-input::placeholder{color:var(--muted);font-style:italic;}
 .voice-btn{width:30px;height:30px;min-width:30px;border-radius:7px;
   background:rgba(77,184,255,.08);border:1px solid rgba(77,184,255,.2);
-  color:var(--muted);font-size:.85rem;display:flex;align-items:center;justify-content:center;}
+  color:var(--muted);font-size:.85rem;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:all .2s;}
+.voice-btn:hover{background:rgba(77,184,255,.15);color:var(--arc);}
 .send-btn{width:34px;height:34px;min-width:34px;border-radius:8px;
   background:linear-gradient(135deg,var(--arc-dim),var(--arc));
   border:none;color:var(--bg);font-size:.9rem;
-  display:flex;align-items:center;justify-content:center;}
+  display:flex;align-items:center;justify-content:center;cursor:pointer;transition:all .2s;}
+.send-btn:hover{opacity:.85;transform:scale(1.05);}
 .hint{font-family:var(--font-mono);font-size:.58rem;color:var(--muted);
   text-align:center;margin-top:.35rem;letter-spacing:.04em;}
 .hint span{color:var(--arc);}
@@ -217,9 +220,9 @@ h1{font-family:var(--font-title);font-size:clamp(1.6rem,4vw,2.6rem);font-weight:
 
 <div class="input-bar">
   <div class="input-wrap">
-    <div class="voice-btn">&#127897;&#65039;</div>
-    <div class="fake-input">Ask Tesla anything about electricity, invention, the universe...</div>
-    <div class="send-btn">&#9889;</div>
+    <button class="voice-btn" id="voice-btn" title="Click to speak">&#127897;&#65039;</button>
+    <input type="text" id="chat-input" placeholder="Ask Tesla anything about electricity, invention, the universe..."/>
+    <button class="send-btn" id="send-btn" title="Send message">&#9889;</button>
   </div>
   <div class="hint">Run locally with <span>./start.sh</span> &#8226; Source on <span>GitHub &#8594;</span></div>
 </div>
@@ -232,6 +235,105 @@ for(let i=0;i<10;i++){
   l.style.cssText='left:'+Math.random()*100+'%;height:'+(50+Math.random()*50)+'%;top:'+Math.random()*50+'%;--dur:'+(3+Math.random()*5)+'s;--delay:'+Math.random()*4+'s';
   bgc.appendChild(l);
 }
+
+// Chat functionality
+const chatInput = document.getElementById('chat-input');
+const sendBtn = document.getElementById('send-btn');
+const voiceBtn = document.getElementById('voice-btn');
+const suggestChips = document.querySelectorAll('.suggest-chip');
+
+// WebSocket connection (optional - only if backend is running)
+let ws = null;
+
+function connectWebSocket() {
+  try {
+    const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+    ws = new WebSocket(`${protocol}//${window.location.host}/ws`);
+    
+    ws.onopen = () => {
+      console.log('Connected to Tesla backend');
+    };
+    
+    ws.onmessage = (event) => {
+      const data = JSON.parse(event.data);
+      if (data.response) {
+        console.log('Tesla:', data.response);
+        // Play audio if available
+        if (data.audio) {
+          const audio = new Audio(`data:audio/mp3;base64,${data.audio}`);
+          audio.play();
+        }
+      }
+    };
+    
+    ws.onerror = (error) => {
+      console.error('WebSocket error:', error);
+    };
+  } catch (e) {
+    console.log('Backend not available - running in demo mode');
+  }
+}
+
+function sendMessage() {
+  const message = chatInput.value.trim();
+  if (!message) return;
+  
+  console.log('You:', message);
+  
+  if (ws && ws.readyState === WebSocket.OPEN) {
+    ws.send(JSON.stringify({ message: message }));
+  } else {
+    // Demo response if backend is not available
+    console.log('Tesla: Fascinating question! The universe is governed by the principles of energy and resonance...');
+  }
+  
+  chatInput.value = '';
+  chatInput.focus();
+}
+
+sendBtn.addEventListener('click', sendMessage);
+chatInput.addEventListener('keypress', (e) => {
+  if (e.key === 'Enter') {
+    sendMessage();
+  }
+});
+
+// Voice input
+voiceBtn.addEventListener('click', () => {
+  const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+  if (!SpeechRecognition) {
+    alert('Speech Recognition not supported in your browser');
+    return;
+  }
+  
+  const recognition = new SpeechRecognition();
+  recognition.start();
+  
+  recognition.onresult = (event) => {
+    const transcript = Array.from(event.results)
+      .map(result => result[0].transcript)
+      .join('');
+    chatInput.value = transcript;
+    sendMessage();
+  };
+  
+  recognition.onerror = (event) => {
+    console.error('Speech recognition error:', event.error);
+  };
+});
+
+// Suggest chips click handler
+suggestChips.forEach(chip => {
+  chip.addEventListener('click', () => {
+    const text = chip.textContent.replace(/^[^\s]*\s/, ''); // Remove emoji
+    chatInput.value = text;
+    chatInput.focus();
+  });
+});
+
+// Try to connect to WebSocket on page load
+window.addEventListener('load', connectWebSocket);
 </script>
 </body>
 </html>
+
